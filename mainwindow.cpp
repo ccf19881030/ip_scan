@@ -21,6 +21,8 @@ MainWindow::MainWindow(QWidget *parent) :
      header.append(QObject::tr("Connected?"));
      header.append("");
      ui->tableWidget->setHorizontalHeaderLabels(header);
+     ui->tableWidget->setShowGrid(true);
+     ui->tableWidget->setStyleSheet("selection-background-color:lightblue;");
 
      ui->tableWidget->horizontalHeader()->setStretchLastSection(true);
 
@@ -145,10 +147,14 @@ void MainWindow::startScan() {
             int exitCode = QProcess::execute("ping", QStringList() << "-c1" << ipRange[row_index]);
             if (0 == exitCode) {
                 // it's alive
-                ui->tableWidget->setItem(row_index,1,new QTableWidgetItem("Alive"));
+                QTableWidgetItem *statusItem = new QTableWidgetItem();
+                statusItem->setIcon(QIcon(":/images/online_icon.png"));
+                ui->tableWidget->setItem(row_index,1,statusItem);
             } else {
                 // it's dead
-                ui->tableWidget->setItem(row_index,1,new QTableWidgetItem("Dead"));
+                QTableWidgetItem *statusItem = new QTableWidgetItem();
+                statusItem->setIcon(QIcon(":/images/offline_icon.png"));
+                ui->tableWidget->setItem(row_index,1,statusItem);
             }
 
 
