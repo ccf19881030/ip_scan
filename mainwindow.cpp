@@ -38,16 +38,31 @@ MainWindow::MainWindow(QWidget *parent) :
 
      shellProcess = new ShellProcess(this);
      connect(shellProcess, SIGNAL(pingCompleted()), this, SLOT(onPingComplete()));
-     //connect(shellProcess, SIGNAL(pingFailed(QString)), this, SLOT(onPingFailed(QString)));
+     connect(shellProcess, SIGNAL(pingFailed(QString)), this, SLOT(onPingFailed(QString)));
      connect(shellProcess, SIGNAL(pingSuccess(QString)), this, SLOT(onPingSuccess(QString)));
 
 }
 
 void MainWindow::onPingSuccess(QString ip) {
     qDebug() << ip + " ping success";
+
+    int hostIndex = scanHosts.indexOf(ip);
+
+    QTableWidgetItem *statusItem = new QTableWidgetItem();
+    statusItem->setIcon(QIcon(":/images/online_icon.png"));
+    ui->tableWidget->setItem(hostIndex,1,statusItem);
+
+
 }
 void MainWindow::onPingFailed(QString ip) {
     qDebug() << ip + " ping failed";
+
+    int hostIndex = scanHosts.indexOf(ip);
+    QTableWidgetItem *statusItem = new QTableWidgetItem();
+    statusItem->setIcon(QIcon(":/images/offline_icon.png"));
+    ui->tableWidget->setItem(hostIndex,1,statusItem);
+
+    qDebug() << ip + " ping failed 111111";
 }
 
 void MainWindow::startExecuteCommand(){
@@ -222,23 +237,12 @@ void MainWindow::startScan() {
     if(msgBox.exec() == QMessageBox::Yes){
       // do something
         qDebug() << "Yes was clicked";
-
+        this->scanHosts = ipRange;
         ui->tableWidget->setRowCount(ipRange.size());
         for(int row_index=0;row_index<ipRange.size();++row_index) {
             ui->tableWidget->setItem(row_index,0,new QTableWidgetItem(ipRange[row_index]));
-//            int exitCode = QProcess::execute("ping", QStringList() << "-c1" << ipRange[row_index]);
-//            if (0 == exitCode) {
-//                // it's alive
-//                QTableWidgetItem *statusItem = new QTableWidgetItem();
-//                statusItem->setIcon(QIcon(":/images/online_icon.png"));
-//                ui->tableWidget->setItem(row_index,1,statusItem);
-//            } else {
-//                // it's dead
-//                QTableWidgetItem *statusItem = new QTableWidgetItem();
-//                statusItem->setIcon(QIcon(":/images/offline_icon.png"));
-//                ui->tableWidget->setItem(row_index,1,statusItem);
-//            }
         }
+
         shellProcess->setIpRange(ipRange);
         shellProcess->start();
 

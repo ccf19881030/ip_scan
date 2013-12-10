@@ -38,6 +38,7 @@ private:
 
     QString get_localmachine_ip();
     QStringList generateRangeIP(QString ip1, QString ip2);
+    QStringList scanHosts;
 
 };
 
