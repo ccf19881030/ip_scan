@@ -2,5 +2,6 @@
     <qresource prefix="/images">
         <file>offline_icon.png</file>
         <file>online_icon.png</file>
+        <file>loading.gif</file>
     </qresource>
 </RCC>

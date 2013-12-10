@@ -41,6 +41,9 @@ MainWindow::MainWindow(QWidget *parent) :
      connect(shellProcess, SIGNAL(pingFailed(QString)), this, SLOT(onPingFailed(QString)));
      connect(shellProcess, SIGNAL(pingSuccess(QString)), this, SLOT(onPingSuccess(QString)));
 
+
+     loadingImage = new QMovie(":/images/loading.gif");
+     ui->loadingLabel->setMovie(loadingImage);
 }
 
 void MainWindow::onPingSuccess(QString ip) {
@@ -66,11 +69,15 @@ void MainWindow::onPingFailed(QString ip) {
 }
 
 void MainWindow::onPingComplete() {
+    loadingImage->stop();
+    ui->loadingLabel->hide();
     qDebug() << "handle Result";
 
     QMessageBox msgBox;
     msgBox.setText("All ping completed.");
     msgBox.exec();
+
+
 }
 
 void MainWindow::startScan() {
@@ -129,7 +136,7 @@ void MainWindow::startScan() {
         msgBox.setText("IP not valid!");
         msgBox.exec();
         return;
-    }
+    }    
 
     QStringList ipRange;
     if(ip1List[2].toInt() == ip2List[2].toInt()){
@@ -184,6 +191,8 @@ void MainWindow::startScan() {
 
         shellProcess->setIpRange(ipRange);
         shellProcess->start();
+        ui->loadingLabel->show();
+        loadingImage->start();
 
     }else {
       // do something else
@@ -237,6 +246,7 @@ QString MainWindow::get_localmachine_ip()
 
 MainWindow::~MainWindow()
 {
+    delete loadingImage;
     delete ui;
 
 }

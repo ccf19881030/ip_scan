@@ -3,6 +3,7 @@
 
 #include <QMainWindow>
 #include <QProcess>
+#include <QMovie>
 
 #include "shellprocess.h"
 
@@ -20,7 +21,8 @@ public:
     ShellProcess *shellProcess;
 
 private slots:    
-    void startScan();
+
+    void startScan(); // Execute when 'scan' button clicked.
 
     void on_pushButton_shell_run_clicked();
 
@@ -32,6 +34,7 @@ public slots:
 private:
     Ui::MainWindow *ui;
     QProcess *myProcess;
+    QMovie *loadingImage;
 
     QString get_localmachine_ip();
     QStringList generateRangeIP(QString ip1, QString ip2);
