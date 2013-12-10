@@ -27,6 +27,8 @@ MainWindow::MainWindow(QWidget *parent) :
      ui->tableWidget->horizontalHeader()->setStretchLastSection(true);
 
      connect(ui->pushButton,SIGNAL(clicked()),this,SLOT(startScan()));
+     connect(ui->pushButton_shell_run,SIGNAL(clicked()),this,SLOT(on_pushButton_shell_run_clicked()));
+
      QString localIP = this->get_localmachine_ip();
      QStringList localIPList = localIP.split(".");
      // set default value.
@@ -34,6 +36,86 @@ MainWindow::MainWindow(QWidget *parent) :
      ui->lineEdit_2->setText(localIPList[0]+"."+localIPList[1]+"."+localIPList[2]+".254");
      ui->label_local_ip->setText(localIP);
 
+     shellProcess = new ShellProcess(this);
+     connect(shellProcess, SIGNAL(pingCompleted()), this, SLOT(onPingComplete()));
+     //connect(shellProcess, SIGNAL(pingFailed(QString)), this, SLOT(onPingFailed(QString)));
+     connect(shellProcess, SIGNAL(pingSuccess(QString)), this, SLOT(onPingSuccess(QString)));
+
+}
+
+void MainWindow::onPingSuccess(QString ip) {
+    qDebug() << ip + " ping success";
+}
+void MainWindow::onPingFailed(QString ip) {
+    qDebug() << ip + " ping failed";
+}
+
+void MainWindow::startExecuteCommand(){
+
+    //shellProcess.moveToThread(&updaterThread);
+    //connect(&shellProcess, SIGNAL(resultReady()), this, SLOT(handleResults()));
+        //connect(shellProcess, &ShellProcess::finished, shellProcess, &QObject::deleteLater);
+   // updaterThread.start();
+
+
+//    QString        program = "ping";
+//    QStringList    arguments;
+//    arguments << "-c1" << ui->lineEdit_shell_input->text();
+
+//    myProcess = new QProcess(this);
+
+//    connect (myProcess, SIGNAL(readyReadStandardOutput()), this, SLOT(printOutput()));
+//    connect (myProcess, SIGNAL(readyReadStandardError()), this, SLOT(printError()));
+
+//    myProcess->start(program, arguments);
+
+//    myProcess->waitForFinished();
+}
+
+void MainWindow::printOutput() {
+
+    ui->textEdit_shell_output->append("Got to printOutput()");    // TextEdit to see results
+
+    QByteArray byteArray = myProcess->readAllStandardOutput();
+        QStringList strLines = QString(byteArray).split("\n");
+
+    if(0 == myProcess->exitStatus()){
+        qDebug() << "Success 0";
+    } else {
+        qDebug() << "Failed not 0";
+    }
+
+        foreach (QString line, strLines){
+            ui->textEdit_shell_output->append(line);
+        }
+
+}
+
+void MainWindow::printError() {
+
+    ui->textEdit_shell_output->append("Got to printError()");
+
+        QByteArray byteArray = myProcess->readAllStandardError();
+        QStringList strLines = QString(byteArray).split("\n");
+
+        if(0 == myProcess->exitStatus()){
+            qDebug() << "e:Success 0";
+        } else {
+            qDebug() << "e:Failed not 0";
+        }
+
+        foreach (QString line, strLines){
+            ui->textEdit_shell_output->append(line);
+        }
+
+}
+
+void MainWindow::onPingComplete() {
+    qDebug() << "handle Result";
+
+    QMessageBox msgBox;
+    msgBox.setText("All ping completed.");
+    msgBox.exec();
 
 }
 
@@ -144,21 +226,22 @@ void MainWindow::startScan() {
         ui->tableWidget->setRowCount(ipRange.size());
         for(int row_index=0;row_index<ipRange.size();++row_index) {
             ui->tableWidget->setItem(row_index,0,new QTableWidgetItem(ipRange[row_index]));
-            int exitCode = QProcess::execute("ping", QStringList() << "-c1" << ipRange[row_index]);
-            if (0 == exitCode) {
-                // it's alive
-                QTableWidgetItem *statusItem = new QTableWidgetItem();
-                statusItem->setIcon(QIcon(":/images/online_icon.png"));
-                ui->tableWidget->setItem(row_index,1,statusItem);
-            } else {
-                // it's dead
-                QTableWidgetItem *statusItem = new QTableWidgetItem();
-                statusItem->setIcon(QIcon(":/images/offline_icon.png"));
-                ui->tableWidget->setItem(row_index,1,statusItem);
-            }
-
-
+//            int exitCode = QProcess::execute("ping", QStringList() << "-c1" << ipRange[row_index]);
+//            if (0 == exitCode) {
+//                // it's alive
+//                QTableWidgetItem *statusItem = new QTableWidgetItem();
+//                statusItem->setIcon(QIcon(":/images/online_icon.png"));
+//                ui->tableWidget->setItem(row_index,1,statusItem);
+//            } else {
+//                // it's dead
+//                QTableWidgetItem *statusItem = new QTableWidgetItem();
+//                statusItem->setIcon(QIcon(":/images/offline_icon.png"));
+//                ui->tableWidget->setItem(row_index,1,statusItem);
+//            }
         }
+        shellProcess->setIpRange(ipRange);
+        shellProcess->start();
+
     }else {
       // do something else
         qDebug() << "Yes was *not* clicked";
@@ -213,4 +296,9 @@ MainWindow::~MainWindow()
 {
     delete ui;
 
+}
+
+void MainWindow::on_pushButton_shell_run_clicked()
+{
+shellProcess->start();
 }
