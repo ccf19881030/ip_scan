@@ -65,36 +65,12 @@ void MainWindow::onPingFailed(QString ip) {
     qDebug() << ip + " ping failed 111111";
 }
 
-void MainWindow::startExecuteCommand(){
-
-    //shellProcess.moveToThread(&updaterThread);
-    //connect(&shellProcess, SIGNAL(resultReady()), this, SLOT(handleResults()));
-        //connect(shellProcess, &ShellProcess::finished, shellProcess, &QObject::deleteLater);
-   // updaterThread.start();
-
-
-//    QString        program = "ping";
-//    QStringList    arguments;
-//    arguments << "-c1" << ui->lineEdit_shell_input->text();
-
-//    myProcess = new QProcess(this);
-
-//    connect (myProcess, SIGNAL(readyReadStandardOutput()), this, SLOT(printOutput()));
-//    connect (myProcess, SIGNAL(readyReadStandardError()), this, SLOT(printError()));
-
-//    myProcess->start(program, arguments);
-
-//    myProcess->waitForFinished();
-}
-
-
 void MainWindow::onPingComplete() {
     qDebug() << "handle Result";
 
     QMessageBox msgBox;
     msgBox.setText("All ping completed.");
     msgBox.exec();
-
 }
 
 void MainWindow::startScan() {

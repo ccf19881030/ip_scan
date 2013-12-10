@@ -19,8 +19,7 @@ public:
     ~MainWindow();
     ShellProcess *shellProcess;
 
-private slots:
-    void startExecuteCommand();
+private slots:    
     void startScan();
 
     void on_pushButton_shell_run_clicked();
