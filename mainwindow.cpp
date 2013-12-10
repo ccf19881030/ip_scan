@@ -27,7 +27,7 @@ MainWindow::MainWindow(QWidget *parent) :
      ui->tableWidget->horizontalHeader()->setStretchLastSection(true);
 
      connect(ui->pushButton,SIGNAL(clicked()),this,SLOT(startScan()));
-     connect(ui->pushButton_shell_run,SIGNAL(clicked()),this,SLOT(on_pushButton_shell_run_clicked()));
+
 
      QString localIP = this->get_localmachine_ip();
      QStringList localIPList = localIP.split(".");
@@ -87,43 +87,6 @@ void MainWindow::startExecuteCommand(){
 //    myProcess->waitForFinished();
 }
 
-void MainWindow::printOutput() {
-
-    ui->textEdit_shell_output->append("Got to printOutput()");    // TextEdit to see results
-
-    QByteArray byteArray = myProcess->readAllStandardOutput();
-        QStringList strLines = QString(byteArray).split("\n");
-
-    if(0 == myProcess->exitStatus()){
-        qDebug() << "Success 0";
-    } else {
-        qDebug() << "Failed not 0";
-    }
-
-        foreach (QString line, strLines){
-            ui->textEdit_shell_output->append(line);
-        }
-
-}
-
-void MainWindow::printError() {
-
-    ui->textEdit_shell_output->append("Got to printError()");
-
-        QByteArray byteArray = myProcess->readAllStandardError();
-        QStringList strLines = QString(byteArray).split("\n");
-
-        if(0 == myProcess->exitStatus()){
-            qDebug() << "e:Success 0";
-        } else {
-            qDebug() << "e:Failed not 0";
-        }
-
-        foreach (QString line, strLines){
-            ui->textEdit_shell_output->append(line);
-        }
-
-}
 
 void MainWindow::onPingComplete() {
     qDebug() << "handle Result";

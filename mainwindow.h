@@ -21,8 +21,6 @@ public:
 
 private slots:
     void startExecuteCommand();
-    void printOutput();
-    void printError();
     void startScan();
 
     void on_pushButton_shell_run_clicked();
