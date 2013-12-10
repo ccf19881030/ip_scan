@@ -26,6 +26,8 @@ private slots:
 
     void on_pushButton_shell_run_clicked();
 
+    void on_saveButton_clicked();
+
 public slots:
     void onPingComplete();
     void onPingSuccess(QString ip);
@@ -39,7 +41,6 @@ private:
     QString get_localmachine_ip();
     QStringList generateRangeIP(QString ip1, QString ip2);
     QStringList scanHosts;
-
 };
 
 #endif // MAINWINDOW_H

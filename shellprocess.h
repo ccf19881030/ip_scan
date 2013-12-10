@@ -11,10 +11,12 @@ class ShellProcess : public QThread
     Q_OBJECT
 
 public:
-    explicit ShellProcess(QObject *parent = 0);
-    void run();
+    explicit ShellProcess(QObject *parent = 0);    
 
     QStringList getIpRange();
+
+protected:
+    void run();
 
 
 public slots:

@@ -24,7 +24,7 @@ MainWindow::MainWindow(QWidget *parent) :
      ui->tableWidget->setShowGrid(true);
      ui->tableWidget->setStyleSheet("selection-background-color:lightblue;");
 
-     ui->tableWidget->horizontalHeader()->setStretchLastSection(true);
+     ui->tableWidget->horizontalHeader()->setStretchLastSection(true);     
 
      connect(ui->pushButton,SIGNAL(clicked()),this,SLOT(startScan()));
 
@@ -35,13 +35,6 @@ MainWindow::MainWindow(QWidget *parent) :
      ui->lineEdit->setText(localIPList[0]+"."+localIPList[1]+"."+localIPList[2]+".1");
      ui->lineEdit_2->setText(localIPList[0]+"."+localIPList[1]+"."+localIPList[2]+".254");
      ui->label_local_ip->setText(localIP);
-
-     shellProcess = new ShellProcess(this);
-     connect(shellProcess, SIGNAL(pingCompleted()), this, SLOT(onPingComplete()));
-     connect(shellProcess, SIGNAL(pingFailed(QString)), this, SLOT(onPingFailed(QString)));
-     connect(shellProcess, SIGNAL(pingSuccess(QString)), this, SLOT(onPingSuccess(QString)));
-
-
      loadingImage = new QMovie(":/images/loading.gif");
      ui->loadingLabel->setMovie(loadingImage);
 }
@@ -172,8 +165,6 @@ void MainWindow::startScan() {
         }
     }
 
-    // qDebug() << ipRange;
-
     QString messageTip = "开始从IP "+ ip1 + "扫描到 " + ip2 + " ?";
     QMessageBox msgBox;
     msgBox.setWindowTitle("扫描IP");
@@ -188,9 +179,30 @@ void MainWindow::startScan() {
         for(int row_index=0;row_index<ipRange.size();++row_index) {
             ui->tableWidget->setItem(row_index,0,new QTableWidgetItem(ipRange[row_index]));
         }
+        ShellProcess *shellProcess;
+        QStringList perIpRange;
+        for(int ip_count=0;ip_count<ipRange.size();ip_count++){
+            if(ip_count % 20 == 0) {
+                perIpRange.clear();
+                perIpRange << ipRange[ip_count];
+            }else {
+               perIpRange << ipRange[ip_count];
+            }
 
-        shellProcess->setIpRange(ipRange);
-        shellProcess->start();
+            if(perIpRange.size() == 20){
+                qDebug() << "ip range" << perIpRange;
+                shellProcess= new ShellProcess(this);
+                connect(shellProcess, SIGNAL(pingCompleted()), this, SLOT(onPingComplete()));
+                connect(shellProcess, SIGNAL(pingFailed(QString)), this, SLOT(onPingFailed(QString)));
+                connect(shellProcess, SIGNAL(pingSuccess(QString)), this, SLOT(onPingSuccess(QString)));
+                connect(shellProcess, SIGNAL(finished()), shellProcess, SLOT(deleteLater()));
+                shellProcess->setIpRange(perIpRange);
+                shellProcess->start();
+            }
+        }
+
+
+
         ui->loadingLabel->show();
         loadingImage->start();
 
@@ -253,5 +265,25 @@ MainWindow::~MainWindow()
 
 void MainWindow::on_pushButton_shell_run_clicked()
 {
-shellProcess->start();
+//shellProcess->start();
+}
+
+void MainWindow::on_saveButton_clicked()
+{
+    QStringList ip;
+    QStringList ipArray;
+    ip << "192.168.1.1"<< "192.168.1.2"<< "192.168.1.3"<< "192.168.1.4"<< "192.168.1.5"<< "192.168.1.6"<< "192.168.1.7"<< "192.168.1.8"<< "192.168.1.9"<< "192.168.1.10"<< "192.168.1.11"<< "192.168.1.12"<< "192.168.1.13"<< "192.168.1.14";
+    for(int i=0;i<ip.size();++i) {
+
+        if(i%4==0) {
+            ipArray.clear();
+            ipArray << ip[i];
+        }else {
+            ipArray << ip[i];
+        }
+        if(ipArray.size()==4){
+            qDebug()<< ipArray;
+        }
+
+    }
 }
