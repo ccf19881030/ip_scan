@@ -1,7 +1,7 @@
 #ifndef SHELLPROCESS_H
 #define SHELLPROCESS_H
 
-#include <QTCore>
+#include <QTCore/QStringList>
 
 #include <QThread>
 
