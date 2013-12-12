@@ -394,6 +394,13 @@
     </item>
     <item>
      <layout class="QHBoxLayout" name="horizontalLayout_3">
+      <item>
+       <widget class="QLabel" name="onlineCount_label">
+        <property name="text">
+         <string>0</string>
+        </property>
+       </widget>
+      </item>
       <item alignment="Qt::AlignLeft">
        <widget class="QLabel" name="label_4">
         <property name="sizePolicy">
@@ -403,7 +410,7 @@
          </sizepolicy>
         </property>
         <property name="text">
-         <string>0台在线</string>
+         <string>台在线</string>
         </property>
        </widget>
       </item>

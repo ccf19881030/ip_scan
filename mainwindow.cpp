@@ -8,6 +8,7 @@ MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
+    onlineCount = 0;
     ui->setupUi(this);
     ui->tableWidget->setWindowTitle("ip list");
     ui->tableWidget->setEditTriggers(QAbstractItemView::NoEditTriggers);
@@ -47,6 +48,9 @@ void MainWindow::onPingSuccess(QString ip) {
     QTableWidgetItem *statusItem = new QTableWidgetItem();
     statusItem->setIcon(QIcon(":/images/online_icon.png"));
     ui->tableWidget->setItem(hostIndex,1,statusItem);
+    onlineCount++;
+
+    ui->onlineCount_label->setText(QString::number(onlineCount));
 
 
 }
@@ -69,8 +73,6 @@ void MainWindow::onPingComplete() {
     QMessageBox msgBox;
     msgBox.setText("All ping completed.");
     msgBox.exec();
-
-
 }
 
 void MainWindow::startScan() {
@@ -172,36 +174,46 @@ void MainWindow::startScan() {
     msgBox.setStandardButtons(QMessageBox::No|QMessageBox::Yes);
     msgBox.setDefaultButton(QMessageBox::Yes);
     if(msgBox.exec() == QMessageBox::Yes){
-      // do something
         qDebug() << "Yes was clicked";
         this->scanHosts = ipRange;
-        ui->tableWidget->setRowCount(ipRange.size());
+        ui->tableWidget->setRowCount(ipRange.size());      
         for(int row_index=0;row_index<ipRange.size();++row_index) {
             ui->tableWidget->setItem(row_index,0,new QTableWidgetItem(ipRange[row_index]));
         }
-        ShellProcess *shellProcess;
-        QStringList perIpRange;
-        for(int ip_count=0;ip_count<ipRange.size();ip_count++){
-            if(ip_count % 20 == 0) {
-                perIpRange.clear();
-                perIpRange << ipRange[ip_count];
-            }else {
-               perIpRange << ipRange[ip_count];
-            }
 
-            if(perIpRange.size() == 20){
-                qDebug() << "ip range" << perIpRange;
-                shellProcess= new ShellProcess(this);
-                connect(shellProcess, SIGNAL(pingCompleted()), this, SLOT(onPingComplete()));
-                connect(shellProcess, SIGNAL(pingFailed(QString)), this, SLOT(onPingFailed(QString)));
-                connect(shellProcess, SIGNAL(pingSuccess(QString)), this, SLOT(onPingSuccess(QString)));
-                connect(shellProcess, SIGNAL(finished()), shellProcess, SLOT(deleteLater()));
-                shellProcess->setIpRange(perIpRange);
-                shellProcess->start();
+        int ipArraySize = ipRange.size();
+        int perIPArraySize = ipArraySize / THREAD_SIZE;
+        qDebug() << "ip in one thread size: " << perIPArraySize;
+        int start_outer = 0;
+        int start_innerer = 0;
+        QStringList ip_in_thread[THREAD_SIZE];
+        for(start_outer;start_outer<THREAD_SIZE;++start_outer){
+            for(start_innerer =  start_outer*perIPArraySize;start_innerer< (start_outer+1) * perIPArraySize;start_innerer++) {
+                ip_in_thread[start_outer] << ipRange[start_innerer];
             }
+            qDebug() << "##### " << start_outer ;
+            qDebug() << " ---- " << ip_in_thread[start_outer] << " .";
         }
 
+        qDebug() << "start_innerer " << start_innerer ;
+        qDebug() << "start_outer " << start_outer ;
 
+        for(int new_start=start_innerer, thread_index=0;new_start<ipArraySize;new_start++){
+           qDebug() << " ---- " << ipRange[new_start] << " .";
+           ip_in_thread[thread_index] << ipRange[new_start];
+           thread_index++;
+        }
+
+        ShellProcess *shellProcess;
+        for(int i=0;i<THREAD_SIZE;i++){
+            shellProcess= new ShellProcess(this);
+            connect(shellProcess, SIGNAL(pingCompleted()), this, SLOT(onPingComplete()));
+            connect(shellProcess, SIGNAL(pingFailed(QString)), this, SLOT(onPingFailed(QString)));
+            connect(shellProcess, SIGNAL(pingSuccess(QString)), this, SLOT(onPingSuccess(QString)));
+            connect(shellProcess, SIGNAL(finished()), shellProcess, SLOT(deleteLater()));
+            shellProcess->setIpRange(ip_in_thread[i]);
+            shellProcess->start();
+        }
 
         ui->loadingLabel->show();
         loadingImage->start();
@@ -261,29 +273,4 @@ MainWindow::~MainWindow()
     delete loadingImage;
     delete ui;
 
-}
-
-void MainWindow::on_pushButton_shell_run_clicked()
-{
-//shellProcess->start();
-}
-
-void MainWindow::on_saveButton_clicked()
-{
-    QStringList ip;
-    QStringList ipArray;
-    ip << "192.168.1.1"<< "192.168.1.2"<< "192.168.1.3"<< "192.168.1.4"<< "192.168.1.5"<< "192.168.1.6"<< "192.168.1.7"<< "192.168.1.8"<< "192.168.1.9"<< "192.168.1.10"<< "192.168.1.11"<< "192.168.1.12"<< "192.168.1.13"<< "192.168.1.14";
-    for(int i=0;i<ip.size();++i) {
-
-        if(i%4==0) {
-            ipArray.clear();
-            ipArray << ip[i];
-        }else {
-            ipArray << ip[i];
-        }
-        if(ipArray.size()==4){
-            qDebug()<< ipArray;
-        }
-
-    }
 }

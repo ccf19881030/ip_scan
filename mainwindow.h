@@ -6,6 +6,7 @@
 #include <QMovie>
 
 #include "shellprocess.h"
+#define THREAD_SIZE 100
 
 namespace Ui {
 class MainWindow;
@@ -24,10 +25,6 @@ private slots:
 
     void startScan(); // Execute when 'scan' button clicked.
 
-    void on_pushButton_shell_run_clicked();
-
-    void on_saveButton_clicked();
-
 public slots:
     void onPingComplete();
     void onPingSuccess(QString ip);
@@ -38,9 +35,11 @@ private:
     QProcess *myProcess;
     QMovie *loadingImage;
 
+
     QString get_localmachine_ip();
     QStringList generateRangeIP(QString ip1, QString ip2);
     QStringList scanHosts;
+    int onlineCount;
 };
 
 #endif // MAINWINDOW_H
