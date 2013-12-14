@@ -16,12 +16,10 @@ ICON = icon.icns
 
 SOURCES += main.cpp\
         mainwindow.cpp \
-    shellprocess.cpp \
-    scan.cpp
+    shellprocess.cpp
 
 HEADERS  += mainwindow.h \
-    shellprocess.h \
-    scan.h
+    shellprocess.h
 
 FORMS += \
     mainwindow.ui
