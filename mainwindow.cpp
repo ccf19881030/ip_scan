@@ -50,9 +50,8 @@ void MainWindow::onPingSuccess(QString ip) {
     ui->tableWidget->setItem(hostIndex,1,statusItem);
     onlineCount++;
 
+    onlineHosts << ip;
     ui->onlineCount_label->setText(QString::number(onlineCount));
-
-
 }
 void MainWindow::onPingFailed(QString ip) {
     qDebug() << ip + " ping failed";
@@ -63,16 +62,6 @@ void MainWindow::onPingFailed(QString ip) {
     ui->tableWidget->setItem(hostIndex,1,statusItem);
 
     qDebug() << ip + " ping failed 111111";
-}
-
-void MainWindow::onPingComplete() {
-    loadingImage->stop();
-    ui->loadingLabel->hide();
-    qDebug() << "handle Result";
-
-    QMessageBox msgBox;
-    msgBox.setText("All ping completed.");
-    msgBox.exec();
 }
 
 void MainWindow::startScan() {
@@ -167,6 +156,9 @@ void MainWindow::startScan() {
         }
     }
 
+    onlineCount = 0;
+    onlineHosts.clear();
+
     QString messageTip = "开始从IP "+ ip1 + "扫描到 " + ip2 + " ?";
     QMessageBox msgBox;
     msgBox.setWindowTitle("扫描IP");
@@ -176,6 +168,7 @@ void MainWindow::startScan() {
     if(msgBox.exec() == QMessageBox::Yes){
         qDebug() << "Yes was clicked";
         this->scanHosts = ipRange;
+        this->to_scanHosts = ipRange;
         ui->tableWidget->setRowCount(ipRange.size());      
         for(int row_index=0;row_index<ipRange.size();++row_index) {
             ui->tableWidget->setItem(row_index,0,new QTableWidgetItem(ipRange[row_index]));
@@ -272,5 +265,20 @@ MainWindow::~MainWindow()
 {
     delete loadingImage;
     delete ui;
+
+}
+
+void MainWindow::on_showOnlineDevicesButton_clicked() {
+    ui->tableWidget->setRowCount(onlineHosts.size());
+    for(int row_index=0;row_index<onlineHosts.size();++row_index) {
+        ui->tableWidget->setItem(row_index,0,new QTableWidgetItem(onlineHosts[row_index]));
+        QTableWidgetItem *statusItem = new QTableWidgetItem();
+        statusItem->setIcon(QIcon(":/images/online_icon.png"));
+        ui->tableWidget->setItem(row_index,1,statusItem);
+    }
+}
+
+void MainWindow::on_testSSH_Button_clicked()
+{
 
 }

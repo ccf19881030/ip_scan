@@ -23,9 +23,8 @@ public slots:
     void setIpRange(QStringList ipRange);
 
 signals:
-   void pingSuccess(QString ip);
-   void pingFailed(QString ip);
-   void pingCompleted();
+   void commandSuccess(QString ip);
+   void commandFailed(QString ip);
 
 public:
      QStringList ipRange;

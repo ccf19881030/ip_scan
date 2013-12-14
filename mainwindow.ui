@@ -236,9 +236,9 @@
          </widget>
         </item>
         <item row="0" column="1">
-         <widget class="QPushButton" name="pushButton_9">
+         <widget class="QPushButton" name="testSSH_Button">
           <property name="text">
-           <string>PushButton</string>
+           <string>testSSH</string>
           </property>
          </widget>
         </item>
@@ -334,9 +334,9 @@
          </widget>
         </item>
         <item row="0" column="0">
-         <widget class="QPushButton" name="pushButton_3">
+         <widget class="QPushButton" name="showOnlineDevicesButton">
           <property name="text">
-           <string>192.168.111.111</string>
+           <string>只显示在线</string>
           </property>
          </widget>
         </item>
