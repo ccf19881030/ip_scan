@@ -6,6 +6,8 @@
 #include <QMovie>
 
 #include "shellprocess.h"
+#include "device.h"
+
 #define THREAD_SIZE 10
 
 namespace Ui {
@@ -29,8 +31,8 @@ private slots:
     void on_testSSH_Button_clicked();
 
 public slots:
-    void onPingSuccess(QString ip);
-    void onPingFailed(QString ip);
+    void onCommandSuccess(QString ip);
+    void onCommandFailed(QString ip);
 
 private:
     Ui::MainWindow *ui;
@@ -43,6 +45,10 @@ private:
     QStringList scanHosts;
     QStringList to_scanHosts;
     QStringList onlineHosts;
+
+    QVector<Device*> _onlineDevices;
+
+
     int onlineCount;
 };
 

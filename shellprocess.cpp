@@ -16,13 +16,13 @@ void ShellProcess::setIpRange(QStringList ipRange) {
 }
 
 void ShellProcess::run() {
-    QStringList sshArguments;
-    sshArguments << "-o" << "PasswordAuthentication=no" << "-o" << "ChallengeResponseAuthentication=no" << "-o" << "ConnectTimeout=2";
-    sshArguments << "-o" << "UserKnownHostsFile=/dev/null" << "-o" << "StrictHostKeyChecking=no" << "root@10.0.3.228" << "-i" << "/Users/qichunren/RubymineProjects/luna_scanner/lib/keys/yu_pri";
-    sshArguments << " touch /tmp/qichunren_qqqqqq";
+//    QStringList sshArguments;
+//    sshArguments << "-o" << "PasswordAuthentication=no" << "-o" << "ChallengeResponseAuthentication=no" << "-o" << "ConnectTimeout=2";
+//    sshArguments << "-o" << "UserKnownHostsFile=/dev/null" << "-o" << "StrictHostKeyChecking=no" << "root@10.0.3.228" << "-i" << "/Users/qichunren/RubymineProjects/luna_scanner/lib/keys/yu_pri";
+//    sshArguments << " touch /tmp/qichunren_qqqqqq";
 
-    int shellExitCode = QProcess::execute("ssh", sshArguments);
-    return;
+//    int shellExitCode = QProcess::execute("ssh", sshArguments);
+//    return;
 
 
         QString ip;

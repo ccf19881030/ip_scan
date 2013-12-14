@@ -40,7 +40,7 @@ MainWindow::MainWindow(QWidget *parent) :
      ui->loadingLabel->setMovie(loadingImage);
 }
 
-void MainWindow::onPingSuccess(QString ip) {
+void MainWindow::onCommandSuccess(QString ip) {
     qDebug() << ip + " ping success";
 
     int hostIndex = scanHosts.indexOf(ip);
@@ -52,8 +52,13 @@ void MainWindow::onPingSuccess(QString ip) {
 
     onlineHosts << ip;
     ui->onlineCount_label->setText(QString::number(onlineCount));
+
+    Device *device = new Device();
+    device->setIp(ip);
+    _onlineDevices.append(device);
+
 }
-void MainWindow::onPingFailed(QString ip) {
+void MainWindow::onCommandFailed(QString ip) {
     qDebug() << ip + " ping failed";
 
     int hostIndex = scanHosts.indexOf(ip);
@@ -200,9 +205,8 @@ void MainWindow::startScan() {
         ShellProcess *shellProcess;
         for(int i=0;i<THREAD_SIZE;i++){
             shellProcess= new ShellProcess(this);
-            connect(shellProcess, SIGNAL(pingCompleted()), this, SLOT(onPingComplete()));
-            connect(shellProcess, SIGNAL(pingFailed(QString)), this, SLOT(onPingFailed(QString)));
-            connect(shellProcess, SIGNAL(pingSuccess(QString)), this, SLOT(onPingSuccess(QString)));
+            connect(shellProcess, SIGNAL(commandSuccess(QString)), this, SLOT(onCommandSuccess(QString)));
+            connect(shellProcess, SIGNAL(commandFailed(QString)), this, SLOT(onCommandFailed(QString)));
             connect(shellProcess, SIGNAL(finished()), shellProcess, SLOT(deleteLater()));
             shellProcess->setIpRange(ip_in_thread[i]);
             shellProcess->start();
@@ -269,9 +273,9 @@ MainWindow::~MainWindow()
 }
 
 void MainWindow::on_showOnlineDevicesButton_clicked() {
-    ui->tableWidget->setRowCount(onlineHosts.size());
-    for(int row_index=0;row_index<onlineHosts.size();++row_index) {
-        ui->tableWidget->setItem(row_index,0,new QTableWidgetItem(onlineHosts[row_index]));
+    ui->tableWidget->setRowCount(_onlineDevices.size());
+    for(int row_index=0;row_index<_onlineDevices.size();++row_index) {
+        ui->tableWidget->setItem(row_index,0,new QTableWidgetItem(_onlineDevices[row_index]->ip()));
         QTableWidgetItem *statusItem = new QTableWidgetItem();
         statusItem->setIcon(QIcon(":/images/online_icon.png"));
         ui->tableWidget->setItem(row_index,1,statusItem);
