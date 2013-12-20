@@ -28,15 +28,24 @@ void ShellProcess::run() {
         QString ip;
         foreach( ip, ipRange ){
             qDebug() << "ping " + ip;
-            int exitCode = QProcess::execute("ping", QStringList() << "-c 1" << "-t 2" << ip);
+            int exitCode;
+       #ifdef WIN32
+            //启动一个ping进程，然后等待该进程结束。
+//              exitCode = QProcess::execute("ping", QStringList() << ip << "-n 1" << "-i 2");
+            QString strArg = "ping " + ip + " -n 1 -i 2";
+            exitCode = QProcess::execute(strArg);
+       #else
+            exitCode = QProcess::execute("ping", QStringList() << "-c 1" << "-t 2" << ip);
+       #endif
+
             if (0 == exitCode) {
                 // it's alive
-                qDebug() << "shell ping " + ip + " sucess";
+                qDebug() << "shell ping " + ip + " success";
                 emit commandSuccess(ip);
             } else {
                 qDebug() << "shell ping " + ip + " failed";
                 emit commandFailed(ip);
             }
         }
-    }
+}
 

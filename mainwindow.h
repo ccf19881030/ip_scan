@@ -33,6 +33,8 @@ private slots:
 public slots:
     void onCommandSuccess(QString ip);
     void onCommandFailed(QString ip);
+    //更新当前扫描ip的进度
+    void update_scanProgress(QString ip);
 
 private:
     Ui::MainWindow *ui;
@@ -48,8 +50,10 @@ private:
 
     QVector<Device*> _onlineDevices;
 
-
     int onlineCount;
+
+    double currentScanNum;//扫描的进度
+    double totalScanNum;//总的IP扫描数目
 };
 
 #endif // MAINWINDOW_H

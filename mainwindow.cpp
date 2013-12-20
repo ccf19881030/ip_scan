@@ -38,6 +38,12 @@ MainWindow::MainWindow(QWidget *parent) :
      ui->label_local_ip->setText(localIP);
      loadingImage = new QMovie(":/images/loading.gif");
      ui->loadingLabel->setMovie(loadingImage);
+
+     //初始化扫描IP的进度条
+     currentScanNum = 0.0;
+     ui->progressBar->setRange(0, 100);
+     ui->progressBar->setValue(0);
+     ui->progressBar->setVisible(false);
 }
 
 void MainWindow::onCommandSuccess(QString ip) {
@@ -56,7 +62,6 @@ void MainWindow::onCommandSuccess(QString ip) {
     Device *device = new Device();
     device->setIp(ip);
     _onlineDevices.append(device);
-
 }
 void MainWindow::onCommandFailed(QString ip) {
     qDebug() << ip + " ping failed";
@@ -86,7 +91,7 @@ void MainWindow::startScan() {
 
     if(ip2List.length() != 4){
         QMessageBox msgBox;
-        msgBox.setText("Endding ip not valid!");
+        msgBox.setText("Ending ip not valid!");
         msgBox.exec();
         ui->lineEdit_2->setFocus();
         return;
@@ -163,6 +168,12 @@ void MainWindow::startScan() {
 
     onlineCount = 0;
     onlineHosts.clear();
+    //初始化扫描IP的进度条
+    currentScanNum = 0.0;
+    ui->progressBar->setValue(0);
+    ui->progressBar->setVisible(false);
+    //清空tabWidget的内容
+    ui->tableWidget->clearContents();
 
     QString messageTip = "开始从IP "+ ip1 + "扫描到 " + ip2 + " ?";
     QMessageBox msgBox;
@@ -202,12 +213,18 @@ void MainWindow::startScan() {
            thread_index++;
         }
 
+        //获取需要扫描的IP总数目
+        totalScanNum = (double)ipRange.size();
+
         ShellProcess *shellProcess;
         for(int i=0;i<THREAD_SIZE;i++){
             shellProcess= new ShellProcess(this);
             connect(shellProcess, SIGNAL(commandSuccess(QString)), this, SLOT(onCommandSuccess(QString)));
             connect(shellProcess, SIGNAL(commandFailed(QString)), this, SLOT(onCommandFailed(QString)));
             connect(shellProcess, SIGNAL(finished()), shellProcess, SLOT(deleteLater()));
+            //连接扫描结束信号(成功或者失败)和扫描进度槽函数
+            connect(shellProcess, SIGNAL(commandSuccess(QString)), this, SLOT(update_scanProgress(QString)));
+            connect(shellProcess, SIGNAL(commandFailed(QString)), this, SLOT(update_scanProgress(QString)));
             shellProcess->setIpRange(ip_in_thread[i]);
             shellProcess->start();
         }
@@ -215,12 +232,12 @@ void MainWindow::startScan() {
         ui->loadingLabel->show();
         loadingImage->start();
 
+        //显示IP扫描的进度条
+        ui->progressBar->setVisible(true);
     }else {
       // do something else
         qDebug() << "Yes was *not* clicked";
     }
-
-
 }
 
 /*
@@ -285,4 +302,18 @@ void MainWindow::on_showOnlineDevicesButton_clicked() {
 void MainWindow::on_testSSH_Button_clicked()
 {
 
+}
+
+void MainWindow::update_scanProgress(QString ip)
+{
+    currentScanNum += 1.0;
+    double scanProgress = (currentScanNum/totalScanNum)*100;
+    qDebug() << "ip" << ip << " scan finished!";
+    qDebug() << "scan progress: " << scanProgress <<endl;
+    ui->progressBar->setValue(scanProgress);
+    if(100 == (int)scanProgress){//IP扫描完毕
+        //扫描完成了后，loading图片停止，并隐藏进度条和loading图片
+        ui->progressBar->setVisible(false);
+        ui->loadingLabel->setVisible(false);
+    }
 }
