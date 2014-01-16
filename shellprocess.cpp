@@ -29,7 +29,7 @@ void ShellProcess::run() {
         foreach( ip, ipRange ){
             qDebug() << "ping " + ip;
             int exitCode;
-       #ifdef WIN32
+       #ifdef Q_OS_WIN
             //启动一个ping进程，然后等待该进程结束。
 //              exitCode = QProcess::execute("ping", QStringList() << ip << "-n 1" << "-i 2");
             QString strArg = "ping " + ip + " -n 1 -i 2";
